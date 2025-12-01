@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>現在式 vs 過去式 大挑戰 (基礎版)</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', 'Fredoka', sans-serif;
+            background-color: #F0F9FF;
+            background-image: radial-gradient(#bae6fd 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .btn-option {
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .btn-option:active {
+            transform: scale(0.98);
+            box-shadow: none;
+        }
+        .correct-anim { animation: bounce 0.5s; }
+        .wrong-anim { animation: shake 0.5s; }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .keyword-highlight {
+            color: #d946ef; /* 亮粉色強調時間關鍵字 */
+            font-weight: bold;
+            background-color: #fce7f3; /* 淺粉底色增加可讀性 */
+            padding: 0 4px;
+            border-radius: 4px;
+            display: inline-block; /* 避免換行斷開 */
+        }
+        
+        .blank-space {
+            display: inline-block;
+            border-bottom: 4px solid #cbd5e1;
+            min-width: 80px;
+            margin: 0 8px;
+            text-align: center;
+            color: #0284c7;
+            font-weight: bold;
+        }
+
+        /* 表格樣式 */
+        .table-container {
+            max-height: 70vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+        th { position: sticky; top: 0; background: #e0f2fe; z-index: 10; }
+        
+        /* 手寫板樣式 */
+        #drawing-canvas {
+            touch-action: none;
+            background-image: linear-gradient(#f0f0f0 1px, transparent 1px), linear-gradient(90deg, #f0f0f0 1px, transparent 1px);
+            background-size: 20px 20px;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 md:p-4">
+
+    <!-- 遊戲容器 -->
+    <div class="relative bg-white w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden border-4 border-sky-200 min-h-[80vh] flex flex-col">
+        
+        <!-- 1. 開始畫面 -->
+        <div id="start-screen" class="p-8 text-center flex-grow flex flex-col justify-center items-center space-y-6">
+            <div class="max-w-md w-full space-y-6">
+                <h1 class="text-4xl md:text-5xl font-black text-sky-600 tracking-wide">英文時態大挑戰</h1>
+                <div class="text-7xl">⏳ vs 📅</div>
+                <p class="text-gray-600 text-lg leading-relaxed">
+                    小朋友，請看清楚句子的<span class="text-pink-500 font-bold">時間</span>，<br>
+                    選出正確的動作喔！
+                </p>
+                
+                <div class="bg-sky-50 p-5 rounded-xl text-left mx-auto shadow-sm border border-sky-100">
+                    <h3 class="font-bold text-sky-800 mb-2 border-b border-sky-200 pb-1">⚡ 破關秘籍：</h3>
+                    <ul class="text-sky-900 text-base space-y-4">
+                        <li>
+                            <div>🌞 <span class="font-bold text-pink-600">Every day</span> (每天) ➝ 用原本的樣子 (Play)</div>
+                            <div class="text-slate-500 text-sm mt-1 ml-6 bg-white/60 inline-block px-2 py-1 rounded border border-sky-100">
+                                💡 短時間內不會改變的事情
+                            </div>
+                        </li>
+                        <li>
+                            <div>📅 <span class="font-bold text-pink-600">Yesterday</span> (昨天) ➝ 加 <span class="font-bold bg-yellow-200 px-1 rounded">ed</span> (Play<span class="text-red-600 font-bold">ed</span>)</div>
+                            <div class="text-slate-500 text-sm mt-1 ml-6 bg-white/60 inline-block px-2 py-1 rounded border border-sky-100">
+                                💡 已經發生了也過去的事情
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <button onclick="startGame()" class="w-full bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-bold text-2xl py-4 rounded-2xl shadow-lg transform transition hover:-translate-y-1">
+                    開始測驗 GO! 🚀
+                </button>
+
+                <button onclick="toggleTeacherModal()" class="text-gray-400 text-sm underline hover:text-sky-600">
+                    👨‍🏫 老師專用：查看題庫總表
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. 測驗畫面 -->
+        <div id="quiz-screen" class="hidden flex flex-col h-full bg-gray-50 flex-grow">
+            <!-- 進度條 -->
+            <div class="bg-gray-200 h-3 w-full">
+                <div id="progress-bar" class="bg-green-400 h-3 transition-all duration-300" style="width: 0%"></div>
+            </div>
+            
+            <div class="flex-grow p-4 md:p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+                
+                <!-- 左欄：題目與選項 -->
+                <div class="flex flex-col space-y-4 justify-center">
+                    <div class="flex justify-between w-full text-gray-500 font-bold text-sm px-2">
+                        <span id="question-count">Q: 1/30</span>
+                        <span id="score-display">得分: 0</span>
+                    </div>
+
+                    <!-- 題目卡片 -->
+                    <div class="bg-white p-6 rounded-2xl w-full border-2 border-sky-100 shadow-md min-h-[160px] flex items-center justify-center relative overflow-hidden">
+                         <div class="absolute -top-2 -left-2 w-16 h-16 bg-yellow-100 rounded-full opacity-50 z-0"></div>
+                        <h2 id="question-text" class="text-2xl md:text-3xl text-gray-800 font-bold leading-relaxed z-10 text-center relative w-full">
+                            <!-- 題目 JS 填充 -->
+                        </h2>
+                    </div>
+
+                    <!-- 選項按鈕 -->
+                    <div id="options-container" class="grid grid-cols-1 gap-3 w-full">
+                        <!-- 選項 JS 產生 -->
+                    </div>
+
+                    <!-- 回饋訊息 -->
+                    <div id="feedback-area" class="h-8 flex items-center justify-center font-bold text-lg opacity-0 transition-opacity">
+                        <!-- JS 填充 -->
+                    </div>
+                </div>
+
+                <!-- 右欄：手寫板 -->
+                <div class="flex flex-col h-full min-h-[300px] lg:min-h-auto">
+                    <div class="flex-grow relative border-2 border-gray-300 rounded-2xl overflow-hidden bg-white shadow-md flex flex-col">
+                        <div class="bg-slate-100 px-3 py-2 flex justify-between items-center border-b border-gray-200">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-bold text-slate-600">📝 重點筆記區</span>
+                                <div class="flex gap-1 ml-2">
+                                    <button onclick="setPenColor('#2563eb')" class="w-5 h-5 rounded-full bg-blue-600 border-2 border-white shadow-sm hover:scale-110"></button>
+                                    <button onclick="setPenColor('#dc2626')" class="w-5 h-5 rounded-full bg-red-600 border-2 border-white shadow-sm hover:scale-110"></button>
+                                </div>
+                            </div>
+                            <button onclick="clearCanvas()" class="text-xs bg-white border border-gray-300 text-gray-600 px-3 py-1 rounded-full hover:bg-gray-100 transition shadow-sm font-medium">
+                                🧹 清除
+                            </button>
+                        </div>
+                        
+                        <div class="relative flex-grow w-full bg-white" id="canvas-container">
+                             <canvas id="drawing-canvas" class="absolute inset-0 w-full h-full block"></canvas>
+                             <div id="canvas-hint" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-gray-200 text-3xl font-bold pointer-events-none select-none">
+                                可以在這裡寫字喔
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 3. 結果畫面 -->
+        <div id="result-screen" class="hidden p-8 text-center flex-grow flex flex-col justify-center items-center space-y-6">
+            <div class="max-w-md w-full space-y-6">
+                <h2 class="text-3xl font-bold text-gray-800">測驗結束！🎉</h2>
+                
+                <div class="py-6 bg-sky-50 rounded-3xl border-2 border-sky-100">
+                    <div class="text-gray-500 text-lg">你的分數</div>
+                    <div id="final-score" class="text-6xl font-black text-sky-500">100</div>
+                    <div class="text-gray-400 text-sm mt-2">滿分 300 分</div>
+                </div>
+
+                <p id="result-comment" class="text-xl font-bold text-orange-500 min-h-[2rem]">
+                    <!-- 評語 -->
+                </p>
+
+                <button onclick="restartGame()" class="w-full bg-sky-400 hover:bg-sky-300 text-white font-bold text-xl py-3 rounded-xl shadow-md transition">
+                    再玩一次 🔄
+                </button>
+                <button onclick="toggleTeacherModal()" class="block w-full text-gray-400 text-sm underline hover:text-sky-600 mt-2">
+                    👨‍🏫 查看題庫與答案
+                </button>
+            </div>
+        </div>
+
+        <!-- 4. 教師專用題庫 Modal -->
+        <div id="teacher-modal" class="hidden absolute inset-0 bg-white z-50 flex flex-col">
+            <div class="bg-sky-100 p-4 flex flex-col md:flex-row justify-between items-center border-b border-sky-200 gap-3">
+                <h3 class="font-bold text-sky-800 text-lg">📚 題庫總表 (30題)</h3>
+                
+                <div class="flex items-center gap-2">
+                    <div id="password-area" class="flex items-center gap-2">
+                        <input type="password" id="teacher-pwd" placeholder="請輸入密碼" class="px-3 py-1.5 rounded-lg border border-sky-300 text-sm w-28 focus:outline-none focus:ring-2 focus:ring-sky-400" onkeyup="if(event.key === 'Enter') unlockAnswers()">
+                        <button onclick="unlockAnswers()" class="bg-sky-500 hover:bg-sky-600 text-white px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm transition whitespace-nowrap">解鎖答案</button>
+                    </div>
+                    <div id="unlocked-msg" class="hidden text-green-600 font-bold text-sm bg-green-100 px-3 py-1 rounded-full">
+                        ✅ 已顯示答案
+                    </div>
+                    <button onclick="toggleTeacherModal()" class="text-sky-600 hover:text-sky-900 font-bold text-2xl ml-2 w-8 h-8 flex items-center justify-center rounded-full hover:bg-sky-200 transition">&times;</button>
+                </div>
+            </div>
+            
+            <div class="p-4 table-container bg-white text-sm">
+                <div class="mb-2 text-xs text-gray-500 bg-yellow-50 p-2 rounded border border-yellow-100">
+                    💡 <strong>提示：</strong>預設隱藏答案，請輸入密碼解鎖。
+                </div>
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-gray-700">
+                            <th class="p-2 border-b-2 bg-sky-50 w-12">#</th>
+                            <th class="p-2 border-b-2 bg-sky-50">完整句子 / 關鍵字</th>
+                            <th class="p-2 border-b-2 bg-sky-50 w-32">正解</th>
+                        </tr>
+                    </thead>
+                    <tbody id="questions-table-body" class="text-gray-600">
+                        <!-- JS 動態生成 -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="p-4 border-t border-gray-100 text-center">
+                 <button onclick="toggleTeacherModal()" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg">關閉列表</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 題庫資料 (30題)
+        const allQuestions = [
+            // 1. Play (baseball)
+            { q: "I ___ baseball <span class='keyword-highlight'>every day</span>.", options: ["play", "played"], answer: 0, keyword: "Every day" },
+            { q: "I ___ baseball <span class='keyword-highlight'>yesterday</span>.", options: ["play", "played"], answer: 1, keyword: "Yesterday" },
+            
+            // 2. Drink (milk)
+            { q: "She ___ milk <span class='keyword-highlight'>every morning</span>.", options: ["drinks", "drank"], answer: 0, keyword: "Every morning" },
+            { q: "She ___ milk <span class='keyword-highlight'>last night</span>.", options: ["drinks", "drank"], answer: 1, keyword: "Last night" },
+            
+            // 3. Walk (to school)
+            { q: "We ___ to school <span class='keyword-highlight'>on Mondays</span>.", options: ["walk", "walked"], answer: 0, keyword: "On Mondays" },
+            { q: "We ___ to school <span class='keyword-highlight'>last Sunday</span>.", options: ["walk", "walked"], answer: 1, keyword: "Last Sunday" },
+            
+            // 4. Watch (TV)
+            { q: "They ___ TV <span class='keyword-highlight'>often</span>.", options: ["watch", "watched"], answer: 0, keyword: "Often" },
+            { q: "They ___ TV <span class='keyword-highlight'>yesterday</span>.", options: ["watch", "watched"], answer: 1, keyword: "Yesterday" },
+            
+            // 5. Do (homework) - Irregular
+            { q: "He ___ his homework <span class='keyword-highlight'>every day</span>.", options: ["does", "did"], answer: 0, keyword: "Every day" },
+            { q: "He ___ his homework <span class='keyword-highlight'>last night</span>.", options: ["does", "did"], answer: 1, keyword: "Last night" },
+            
+            // 6. Bark (dog)
+            { q: "The dog ___ <span class='keyword-highlight'>every night</span>.", options: ["barks", "barked"], answer: 0, keyword: "Every night" },
+            { q: "The dog ___ <span class='keyword-highlight'>last night</span>.", options: ["barks", "barked"], answer: 1, keyword: "Last night" },
+            
+            // 7. Help (mom)
+            { q: "I ___ my mom <span class='keyword-highlight'>every week</span>.", options: ["help", "helped"], answer: 0, keyword: "Every week" },
+            { q: "I ___ my mom <span class='keyword-highlight'>last week</span>.", options: ["help", "helped"], answer: 1, keyword: "Last week" },
+            
+            // 8. Cook (dinner)
+            { q: "Dad ___ dinner <span class='keyword-highlight'>on Sundays</span>.", options: ["cooks", "cooked"], answer: 0, keyword: "On Sundays" },
+            { q: "Dad ___ dinner <span class='keyword-highlight'>last Sunday</span>.", options: ["cooks", "cooked"], answer: 1, keyword: "Last Sunday" },
+            
+            // 9. Wash (hands/car)
+            { q: "We ___ the car <span class='keyword-highlight'>every Sunday</span>.", options: ["wash", "washed"], answer: 0, keyword: "Every Sunday" },
+            { q: "We ___ the car <span class='keyword-highlight'>last Sunday</span>.", options: ["wash", "washed"], answer: 1, keyword: "Last Sunday" },
+            
+            // 10. Eat (apple/lunch) - Irregular
+            { q: "I ___ an apple <span class='keyword-highlight'>every day</span>.", options: ["eat", "ate"], answer: 0, keyword: "Every day" },
+            { q: "I ___ an apple <span class='keyword-highlight'>yesterday</span>.", options: ["eat", "ate"], answer: 1, keyword: "Yesterday" },
+            
+            // 11. Clean (room)
+            { q: "I ___ my room <span class='keyword-highlight'>always</span>.", options: ["clean", "cleaned"], answer: 0, keyword: "Always" },
+            { q: "I ___ my room <span class='keyword-highlight'>last weekend</span>.", options: ["clean", "cleaned"], answer: 1, keyword: "Last weekend" },
+            
+            // 12. Go (to park) - Irregular
+            { q: "We ___ to the park <span class='keyword-highlight'>every week</span>.", options: ["go", "went"], answer: 0, keyword: "Every week" },
+            { q: "We ___ to the park <span class='keyword-highlight'>yesterday</span>.", options: ["go", "went"], answer: 1, keyword: "Yesterday" },
+            
+            // 13. Is/Was (Happy) - Irregular BE verb
+            { q: "I ___ happy <span class='keyword-highlight'>today</span>.", options: ["am", "was"], answer: 0, keyword: "Today" },
+            { q: "I ___ happy <span class='keyword-highlight'>yesterday</span>.", options: ["am", "was"], answer: 1, keyword: "Yesterday" },
+            
+            // 14. Visit (grandma)
+            { q: "I ___ (拜訪) grandma <span class='keyword-highlight'>every year</span>.", options: ["visit", "visited"], answer: 0, keyword: "Every year" },
+            { q: "I ___ (拜訪) grandma <span class='keyword-highlight'>last year</span>.", options: ["visit", "visited"], answer: 1, keyword: "Last year" },
+
+            // 15. Rain
+            { q: "It ___ here <span class='keyword-highlight'>often</span>.", options: ["rains", "rained"], answer: 0, keyword: "Often" },
+            { q: "It ___ here <span class='keyword-highlight'>yesterday</span>.", options: ["rains", "rained"], answer: 1, keyword: "Yesterday" }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isAnswering = false;
+        let gameQuestions = [];
+        let isTeacherUnlocked = false; // 追蹤是否已解鎖答案
+
+        // DOM 元素
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const teacherModal = document.getElementById('teacher-modal');
+        const questionsTableBody = document.getElementById('questions-table-body');
+        const teacherPwdInput = document.getElementById('teacher-pwd');
+        const passwordArea = document.getElementById('password-area');
+        const unlockedMsg = document.getElementById('unlocked-msg');
+        
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackArea = document.getElementById('feedback-area');
+        const progressBar = document.getElementById('progress-bar');
+        const questionCount = document.getElementById('question-count');
+        const scoreDisplay = document.getElementById('score-display');
+        const finalScore = document.getElementById('final-score');
+        const resultComment = document.getElementById('result-comment');
+        
+        // 手寫板相關變數
+        const canvas = document.getElementById('drawing-canvas');
+        const ctx = canvas.getContext('2d');
+        const canvasContainer = document.getElementById('canvas-container');
+        const canvasHint = document.getElementById('canvas-hint');
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let currentPenColor = '#2563eb'; 
+
+        window.onload = function() {
+            generateTable();
+            window.addEventListener('resize', resizeCanvas);
+        };
+
+        // --- 洗牌 ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- 手寫板功能 (省略細節以保持簡潔，邏輯同上) ---
+        function setPenColor(color) { currentPenColor = color; ctx.strokeStyle = color; }
+        function resizeCanvas() {
+            if (quizScreen.classList.contains('hidden')) return;
+            const rect = canvasContainer.getBoundingClientRect();
+            if (canvas.width !== rect.width || canvas.height !== rect.height) {
+                canvas.width = rect.width; canvas.height = rect.height;
+                ctx.strokeStyle = currentPenColor; ctx.lineWidth = 3; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+            }
+        }
+        function initCanvasEvents() {
+            canvas.addEventListener('mousedown', startDrawing); canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing); canvas.addEventListener('mouseout', stopDrawing);
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+        function getPointerPos(e) { const rect = canvas.getBoundingClientRect(); return { x: e.clientX - rect.left, y: e.clientY - rect.top }; }
+        function startDrawing(e) { isDrawing = true; const pos = getPointerPos(e); [lastX, lastY] = [pos.x, pos.y]; canvasHint.style.display = 'none'; }
+        function draw(e) { if (!isDrawing) return; const pos = getPointerPos(e); ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(pos.x, pos.y); ctx.stroke(); [lastX, lastY] = [pos.x, pos.y]; }
+        function stopDrawing() { isDrawing = false; }
+        function handleTouchStart(e) { e.preventDefault(); if(e.touches.length > 0) { const t = e.touches[0]; canvas.dispatchEvent(new MouseEvent('mousedown', {clientX: t.clientX, clientY: t.clientY})); } }
+        function handleTouchMove(e) { e.preventDefault(); if(e.touches.length > 0) { const t = e.touches[0]; canvas.dispatchEvent(new MouseEvent('mousemove', {clientX: t.clientX, clientY: t.clientY})); } }
+        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); canvasHint.style.display = 'block'; }
+
+        // --- 題庫表與密碼功能 ---
+        function generateTable() {
+            questionsTableBody.innerHTML = '';
+            allQuestions.forEach((q, index) => {
+                let displayQ = q.q.replace('___', '<span class="text-sky-600 font-bold border-b-2 border-sky-300">____</span>');
+                
+                const tr = document.createElement('tr');
+                tr.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                
+                // 根據是否解鎖決定顯示內容
+                const correctAnswerDisplay = isTeacherUnlocked 
+                    ? `<span class="text-green-600">${q.options[q.answer]}</span>` 
+                    : `<span class="text-gray-300 select-none">🔒 上鎖</span>`;
+
+                tr.innerHTML = `
+                    <td class="p-2 border-b text-gray-400 font-mono align-top">${index + 1}</td>
+                    <td class="p-2 border-b">
+                        <div class="text-gray-800 font-medium text-lg">${displayQ}</div>
+                        <div class="text-xs text-pink-500 mt-1 font-bold">Key: ${q.keyword}</div>
+                    </td>
+                    <td class="p-2 border-b font-bold align-top text-lg">${correctAnswerDisplay}</td>
+                `;
+                questionsTableBody.appendChild(tr);
+            });
+        }
+
+        function unlockAnswers() {
+            const pwd = teacherPwdInput.value;
+            if (pwd === '456') {
+                isTeacherUnlocked = true;
+                generateTable(); // 重新生成表格以顯示答案
+                
+                // UI 切換
+                passwordArea.classList.add('hidden');
+                unlockedMsg.classList.remove('hidden');
+                alert("密碼正確！已顯示答案。");
+            } else {
+                alert("密碼錯誤！請重新輸入。");
+                teacherPwdInput.value = '';
+                teacherPwdInput.focus();
+            }
+        }
+
+        function toggleTeacherModal() {
+            const isHidden = teacherModal.classList.contains('hidden');
+            
+            if (isHidden) {
+                // 打開 Modal
+                teacherModal.classList.remove('hidden');
+                // 每次打開都重置為鎖定狀態
+                isTeacherUnlocked = false;
+                teacherPwdInput.value = '';
+                passwordArea.classList.remove('hidden');
+                unlockedMsg.classList.add('hidden');
+                generateTable(); // 確保是上鎖的畫面
+            } else {
+                // 關閉 Modal
+                teacherModal.classList.add('hidden');
+            }
+        }
+
+        // --- 遊戲邏輯 ---
+        function startGame() {
+            score = 0;
+            currentQuestionIndex = 0;
+            gameQuestions = [...allQuestions]; 
+            shuffleArray(gameQuestions);
+
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            
+            setTimeout(() => {
+                resizeCanvas();
+                initCanvasEvents();
+                clearCanvas();
+            }, 50);
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            isAnswering = true;
+            feedbackArea.style.opacity = '0';
+            
+            const q = gameQuestions[currentQuestionIndex];
+            
+            questionCount.innerText = `Q: ${currentQuestionIndex + 1} / ${gameQuestions.length}`;
+            scoreDisplay.innerText = `得分: ${score}`;
+            const progress = ((currentQuestionIndex) / gameQuestions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            let displayHTML = q.q.replace('___', '<span class="blank-space">?</span>');
+            questionText.innerHTML = displayHTML;
+
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = `btn-option w-full bg-white border-2 border-sky-200 text-sky-700 font-bold text-2xl py-4 rounded-xl hover:bg-sky-50 hover:border-sky-400 focus:outline-none`;
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex, btnElement) {
+            if (!isAnswering) return;
+            isAnswering = false;
+
+            const currentQ = gameQuestions[currentQuestionIndex];
+            const isCorrect = selectedIndex === currentQ.answer;
+
+            const allBtns = optionsContainer.querySelectorAll('button');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (isCorrect) {
+                score += 10;
+                btnElement.classList.remove('bg-white', 'border-sky-200', 'text-sky-700');
+                btnElement.classList.add('bg-green-500', 'border-green-600', 'text-white', 'correct-anim');
+                feedbackArea.innerHTML = '<span class="text-green-600">✅ 好棒！答對了！</span>';
+                
+                const blankSpan = questionText.querySelector('.blank-space');
+                if(blankSpan) {
+                    blankSpan.innerText = currentQ.options[currentQ.answer];
+                    blankSpan.style.color = "#16a34a"; 
+                    blankSpan.style.borderBottomColor = "#16a34a";
+                }
+
+            } else {
+                btnElement.classList.remove('bg-white', 'border-sky-200', 'text-sky-700');
+                btnElement.classList.add('bg-red-400', 'border-red-500', 'text-white', 'wrong-anim');
+                
+                const correctBtn = allBtns[currentQ.answer];
+                correctBtn.classList.add('bg-green-100', 'border-green-400', 'text-green-700');
+                
+                feedbackArea.innerHTML = `<span class="text-red-500">❌ 哎呀！應該是 ${currentQ.options[currentQ.answer]}</span>`;
+            }
+            
+            feedbackArea.style.opacity = '1';
+            scoreDisplay.innerText = `得分: ${score}`;
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < gameQuestions.length) {
+                    renderQuestion();
+                } else {
+                    showResult();
+                }
+            }, 2000); 
+        }
+
+        function showResult() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            finalScore.innerText = score;
+            
+            if (score === 300) {
+                resultComment.innerText = "🏆 太神了！你是英文小天才！";
+            } else if (score >= 240) {
+                resultComment.innerText = "🌟 很棒喔！再一點點就滿分了！";
+            } else if (score >= 150) {
+                resultComment.innerText = "💪 加油加油！多練習就會進步！";
+            } else {
+                resultComment.innerText = "📚 沒關係，我們一起重新複習！";
+            }
+        }
+
+        function restartGame() {
+            startGame();
+        }
+    </script>
+</body>
+</html>
