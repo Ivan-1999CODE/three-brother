@@ -104,6 +104,7 @@
         };
 
         // --- 工具函式 ---
+        // Fisher-Yates Shuffle 演算法，確保隨機性
         const shuffleArray = (array) => {
             const newArray = [...array];
             for (let i = newArray.length - 1; i > 0; i--) {
@@ -195,99 +196,76 @@
             return pool;
         };
 
-        // --- Unit 5 題庫生成 (時態練習) ---
+        // --- Unit 5 題庫生成 (姊姊專用 - 含新增題目) ---
         const generateUnit5QuizPool = () => {
-            const pool = [
-                // 現在式 (Facts/Habits)
+            // 原有的題目
+            const originalPool = [
                 { q: "I ______ to school every day.", options: ["go", "went", "going"], ans: "go", hint: "every day 表示習慣，用現在式。" },
                 { q: "She ______ apples.", options: ["likes", "like", "liked"], ans: "likes", hint: "She 是第三人稱單數，動詞加 s。" },
                 { q: "They ______ students.", options: ["are", "is", "am"], ans: "are", hint: "They 搭配 are。" },
                 { q: "______ you play baseball?", options: ["Do", "Does", "Are"], ans: "Do", hint: "一般動詞問句用助動詞 Do/Does。" },
-                
-                // 過去式 (Past)
                 { q: "I ______ to the park yesterday.", options: ["went", "go", "going"], ans: "went", hint: "yesterday 表示過去，go 的過去式是 went。" },
                 { q: "She ______ a book last night.", options: ["read", "reads", "reading"], ans: "read", hint: "last night 表示過去，read 的過去式還是 read (發音不同)。" },
                 { q: "We ______ TV yesterday morning.", options: ["watched", "watch", "watching"], ans: "watched", hint: "過去式規則變化加 ed。" },
                 { q: "______ you happy yesterday?", options: ["Were", "Was", "Did"], ans: "Were", hint: "You 的過去式 Be 動詞是 Were。" },
                 { q: "He ______ not at home last Sunday.", options: ["was", "were", "did"], ans: "was", hint: "He 的過去式 Be 動詞是 Was。" },
-
-                // 未來式 (Future)
                 { q: "I ______ visit my grandma tomorrow.", options: ["will", "am", "did"], ans: "will", hint: "tomorrow 表示未來，用 will。" },
                 { q: "We ______ going to play soccer.", options: ["are", "is", "will"], ans: "are", hint: "be going to 表示計畫，We 用 are。" },
                 { q: "She ______ go to the zoo next week.", options: ["will", "is", "went"], ans: "will", hint: "next week 表示未來，用 will。" },
                 { q: "They will ______ lunch together.", options: ["eat", "eating", "ate"], ans: "eat", hint: "will 後面接原形動詞。" },
-                
-                // 混合辨析
-                { q: "Look! It is ______ now.", options: ["raining", "rains", "rained"], ans: "raining", hint: "Look! ... now 表示正在發生 (現在進行式)。" },
-                { q: "I ______ an apple yesterday.", options: ["ate", "eat", "eats"], ans: "ate", hint: "yesterday 用過去式 ate。" },
-                { q: "My dad ______ tennis every weekend.", options: ["plays", "play", "playing"], ans: "plays", hint: "every weekend 表示習慣，單數主詞加 s。" },
-                { q: "I ______ 10 years old last year.", options: ["was", "am", "were"], ans: "was", hint: "last year 用過去式。" },
-                { q: "He ______ 12 years old next year.", options: ["will be", "is", "was"], ans: "will be", hint: "next year 用未來式。" },
             ];
 
-            // 補充隨機題
-            const subjects = ["He", "She", "It", "Tom"];
-            const verbs = [
-                { base: "plays", past: "played", future: "will play" },
-                { base: "cooks", past: "cooked", future: "will cook" },
-                { base: "walks", past: "walked", future: "will walk" }
+            // 新增的 30 題 (已移除純數字拼寫題)
+            const newQuestions = [
+                { q: "I ______ English every day.", options: ["study", "studies", "studied"], ans: "study", hint: "every day 表示習慣，用現在式。" },
+                { q: "She ______ math.", options: ["likes", "like", "liking"], ans: "likes", hint: "She 是第三人稱單數，動詞加 s。" },
+                { q: "My dad ______ tennis on Sundays.", options: ["plays", "play", "playing"], ans: "plays", hint: "Sundays 表示習慣，dad 是單數。" },
+                { q: "______ you like papaya?", options: ["Do", "Does", "Are"], ans: "Do", hint: "一般動詞問句用助動詞 Do/Does。" },
+                { q: "They ______ students.", options: ["are", "is", "am"], ans: "are", hint: "They 搭配 are。" },
+                { q: "His favorite subject ______ art.", options: ["is", "are", "be"], ans: "is", hint: "subject 是單數。" },
+                { q: "I ______ to the zoo yesterday.", options: ["went", "go", "will go"], ans: "went", hint: "yesterday 用過去式。" },
+                { q: "She ______ a book last night.", options: ["read", "reads", "reading"], ans: "read", hint: "last night 用過去式。" },
+                { q: "We ______ TV yesterday.", options: ["watched", "watch", "watches"], ans: "watched", hint: "過去式加 ed。" },
+                { q: "He ______ at home last Sunday.", options: ["was", "is", "were"], ans: "was", hint: "過去式 Be 動詞單數用 was。" },
+                { q: "______ you happy yesterday?", options: ["Were", "Was", "Are"], ans: "Were", hint: "You 的過去式 Be 動詞是 Were。" },
+                { q: "I ______ visit my friend tomorrow.", options: ["will", "did", "went"], ans: "will", hint: "tomorrow 用未來式。" },
+                { q: "It ______ rain tomorrow.", options: ["will", "is", "did"], ans: "will", hint: "tomorrow 用未來式。" },
+                { q: "We ______ going to play soccer.", options: ["are", "will", "is"], ans: "are", hint: "be going to 用法。" },
+                { q: "She will ______ an apple.", options: ["eat", "eats", "ate"], ans: "eat", hint: "will 後接原形動詞。" },
+                { q: "Look! It is ______ now.", options: ["raining", "rain", "rains"], ans: "raining", hint: "Look! ... now 用現在進行式。" },
+                // 移除純數字題 (40, 12, 15, 100, 21)
+                { q: "This is ______ book.", options: ["his", "he", "him"], ans: "his", hint: "這是『他的』書，用所有格。" },
+                { q: "______ name is Mary.", options: ["Her", "She", "He"], ans: "Her", hint: "『她的』名字，用所有格。" },
+                { q: "How ______ apples do you have?", options: ["many", "much", "any"], ans: "many", hint: "問可數名詞數量用 How many。" },
+                { q: "Today is ______.", options: ["Sunday", "sunday", "sundae"], ans: "Sunday", hint: "星期開頭要大寫。" },
+                { q: "I ______ need water.", options: ["don't", "not", "no"], ans: "don't", hint: "一般動詞否定用 don't。" },
+                { q: "______ they play music?", options: ["Do", "Does", "Is"], ans: "Do", hint: "They 的助動詞用 Do。" },
+                { q: "He ______ English well.", options: ["speaks", "speak", "speaking"], ans: "speaks", hint: "He 是第三人稱單數。" },
+                { q: "I ______ a bird yesterday.", options: ["saw", "see", "seen"], ans: "saw", hint: "yesterday 用過去式 saw。" },
+                { q: "Science ______ interesting.", options: ["is", "are", "be"], ans: "is", hint: "學科視為單數。" }
             ];
 
-            subjects.forEach(sub => {
-                verbs.forEach(v => {
-                     // 未來式
-                    if(pool.length < 50) {
-                        pool.push({
-                            q: `${sub} ______ tennis tomorrow.`,
-                            options: [v.future.split(' ')[1], v.past, v.base],
-                            ans: v.future.split(' ')[1], // 這裡題目設計 tricky 一點，改為填助動詞後的動詞
-                            hint: "Tomorrow (明天) 是未來式，will 後面接原形動詞。" // 修正題目邏輯
-                        });
-                        // 修正：直接考整句結構更清楚
-                         pool.push({
-                            q: `${sub} ______ tennis tomorrow.`,
-                            options: ["will " + v.future.split(' ')[1], v.past, v.base],
-                            ans: "will " + v.future.split(' ')[1],
-                            hint: "Tomorrow (明天) 是未來式，用 will + 原形。"
-                        });
-                        // 過去式
-                        pool.push({
-                            q: `${sub} ______ dinner yesterday.`,
-                            options: [v.past, v.base, "will " + v.future.split(' ')[1]],
-                            ans: v.past,
-                            hint: "Yesterday (昨天) 是過去式。"
-                        });
-                    }
-                });
-            });
-
-            return shuffleArray(pool).slice(0, 50);
+            // 確保每次呼叫都回傳所有題目的隨機排列
+            const combinedPool = [...originalPool, ...newQuestions];
+            return shuffleArray(combinedPool); 
         };
 
-        // --- Unit 5 重組生成器 (時態句型) ---
+        // --- Unit 5 重組生成器 (姊姊專用 - 含新增句子) ---
         const generateUnit5ScramblePool = () => {
             const pool = [];
             
-            // 1. 現在式 (Habits)
-            const presentSentences = [
+            // 1. 原有的基礎句子
+            const basicSentences = [
                 { en: "I go to school every day.", ch: "我每天去上學。" },
                 { en: "She likes apples.", ch: "她喜歡蘋果。" },
                 { en: "He plays basketball on Sundays.", ch: "他星期日打籃球。" },
                 { en: "We study English.", ch: "我們研讀英文。" },
-                { en: "My favorite subject is math.", ch: "我最喜歡的科目是數學。" }
-            ];
-
-            // 2. 過去式 (Past)
-            const pastSentences = [
+                { en: "My favorite subject is math.", ch: "我最喜歡的科目是數學。" },
                 { en: "I went to the park yesterday.", ch: "我昨天去了公園。" },
                 { en: "She washed the car last night.", ch: "她昨晚洗了車。" },
                 { en: "We played a game yesterday.", ch: "我們昨天玩了遊戲。" },
                 { en: "He was at home yesterday.", ch: "他昨天在家。" },
-                { en: "They ate dinner at 7.", ch: "他們七點吃了晚餐。" }
-            ];
-
-            // 3. 未來式 (Future)
-            const futureSentences = [
+                { en: "They ate dinner at 7.", ch: "他們七點吃了晚餐。" },
                 { en: "I will go home tomorrow.", ch: "我明天會回家。" },
                 { en: "She will buy a new book.", ch: "她將會買一本新書。" },
                 { en: "We are going to play soccer.", ch: "我們正打算去踢足球。" },
@@ -295,7 +273,41 @@
                 { en: "He is going to visit his aunt.", ch: "他打算去拜訪他的阿姨。" }
             ];
 
-            const all = [...presentSentences, ...pastSentences, ...futureSentences];
+            // 2. 新增的 30 句
+            const newSentences = [
+                { en: "I like music.", ch: "我喜歡音樂。" },
+                { en: "She plays the piano.", ch: "她彈鋼琴。" },
+                { en: "We go to school.", ch: "我們去上學。" },
+                { en: "He speaks Chinese.", ch: "他說中文。" },
+                { en: "My favorite subject is art.", ch: "我最喜歡的科目是美術。" },
+                { en: "Today is Friday.", ch: "今天是星期五。" },
+                { en: "I have two apples.", ch: "我有兩顆蘋果。" },
+                { en: "She needs some water.", ch: "她需要一些水。" },
+                { en: "They are my friends.", ch: "他們是我的朋友。" },
+                { en: "His name is Tom.", ch: "他的名字是湯姆。" },
+                { en: "Her bag is blue.", ch: "她的書包是藍色的。" },
+                { en: "Math is difficult.", ch: "數學很難。" },
+                { en: "Science is interesting.", ch: "自然科學很有趣。" },
+                { en: "I went to the park.", ch: "我去了公園。" },
+                { en: "She washed the car.", ch: "她洗了車。" },
+                { en: "We played baseball.", ch: "我們打了棒球。" },
+                { en: "He was at home.", ch: "他在家。" },
+                { en: "It rained yesterday.", ch: "昨天下了雨。" },
+                { en: "I watched TV.", ch: "我看了電視。" },
+                { en: "I will go home.", ch: "我將要回家。" },
+                { en: "She will visit us.", ch: "她將拜訪我們。" },
+                { en: "It will be fun.", ch: "這將會很有趣。" },
+                { en: "We are going to play.", ch: "我們正要去玩。" },
+                { en: "How many apples?", ch: "多少顆蘋果？" },
+                { en: "Do you like English?", ch: "你喜歡英文嗎？" },
+                { en: "Can you help me?", ch: "你能幫我嗎？" },
+                { en: "There are ten boys.", ch: "有十個男孩。" },
+                { en: "It is number five.", ch: "它是五號。" },
+                { en: "I see twenty birds.", ch: "我看見二十隻鳥。" },
+                { en: "Our house is big.", ch: "我們的房子很大。" }
+            ];
+
+            const all = [...basicSentences, ...newSentences];
             
             all.forEach((item, idx) => {
                 pool.push({
@@ -308,90 +320,92 @@
             return shuffleArray(pool);
         };
 
-        // --- 資料庫 ---
-        const UNITS_DATA = {
-            unitNumbers: {
-                title: "數字表 (1-100)",
-                vocab: generateNumberVocab(),
-                grammar: {
-                    notes: [
-                        { title: "1. 基數 (Cardinal Numbers)", rule: "one, two, three...", desc: "用來表示數量。注意 40 是 forty (沒有 u)，100 是 one hundred。", examples: ["I have three apples."] },
-                        { title: "2. 複合數字 (21-99)", rule: "十位數-個位數", desc: "21到99之間的數字，十位數和個位數之間通常會加連字號 (-)。", examples: ["twenty-one (21)"] }
+        // --- 資料庫 (使用 Getter 函數確保每次獲取時都是最新的隨機排列) ---
+        const getUnitsData = () => {
+            return {
+                unitNumbers: {
+                    title: "數字表 (1-100)",
+                    vocab: generateNumberVocab(),
+                    grammar: {
+                        notes: [
+                            { title: "1. 基數 (Cardinal Numbers)", rule: "one, two, three...", desc: "用來表示數量。注意 40 是 forty (沒有 u)，100 是 one hundred。", examples: ["I have three apples."] },
+                            { title: "2. 複合數字 (21-99)", rule: "十位數-個位數", desc: "21到99之間的數字，十位數和個位數之間通常會加連字號 (-)。", examples: ["twenty-one (21)"] }
+                        ],
+                        quiz: generateNumberQuizPool(),
+                        scramble: generateNumberScramblePool()
+                    }
+                },
+                unit5: {
+                    title: "姐姐",
+                    vocab: [
+                        // Days of the week
+                        { id: "u5-1", word: "Sunday", part: "n.", chinese: "星期日", sentence: "I go to church on Sunday.", sentence_ch: "我星期日去教堂。" },
+                        { id: "u5-2", word: "Monday", part: "n.", chinese: "星期一", sentence: "School starts on Monday.", sentence_ch: "星期一開始上學。" },
+                        { id: "u5-3", word: "Tuesday", part: "n.", chinese: "星期二", sentence: "We have PE on Tuesday.", sentence_ch: "我們星期二有體育課。" },
+                        { id: "u5-4", word: "Wednesday", part: "n.", chinese: "星期三", sentence: "It is Wednesday today.", sentence_ch: "今天是星期三。" },
+                        { id: "u5-5", word: "Thursday", part: "n.", chinese: "星期四", sentence: "I play soccer on Thursday.", sentence_ch: "我星期四踢足球。" },
+                        { id: "u5-6", word: "Friday", part: "n.", chinese: "星期五", sentence: "Thank God it's Friday.", sentence_ch: "感謝老天今天是星期五。" },
+                        { id: "u5-7", word: "Saturday", part: "n.", chinese: "星期六", sentence: "I sleep late on Saturday.", sentence_ch: "我星期六睡很晚。" },
+                        { id: "u5-8", word: "day", part: "n.", chinese: "一天；日", sentence: "There are seven days in a week.", sentence_ch: "一週有七天。" },
+                        { id: "u5-9", word: "today", part: "n./adv.", chinese: "今天", sentence: "Today is my birthday.", sentence_ch: "今天是我的生日。" },
+                        
+                        // Fruits
+                        { id: "u5-10", word: "apple", part: "n.", chinese: "蘋果", sentence: "An apple a day keeps the doctor away.", sentence_ch: "一天一蘋果，醫生遠離我。" },
+                        { id: "u5-11", word: "banana", part: "n.", chinese: "香蕉", sentence: "Monkeys like bananas.", sentence_ch: "猴子喜歡香蕉。" },
+                        { id: "u5-12", word: "grape", part: "n.", chinese: "葡萄", sentence: "The grape is purple.", sentence_ch: "這葡萄是紫色的。" },
+                        { id: "u5-13", word: "guava", part: "n.", chinese: "芭樂", sentence: "Guava is rich in Vitamin C.", sentence_ch: "芭樂富含維他命C。" },
+                        { id: "u5-14", word: "orange", part: "n.", chinese: "柳橙", sentence: "I like orange juice.", sentence_ch: "我喜歡柳橙汁。" },
+                        { id: "u5-15", word: "papaya", part: "n.", chinese: "木瓜", sentence: "Papaya milk is delicious.", sentence_ch: "木瓜牛奶很好喝。" },
+                        { id: "u5-16", word: "pineapple", part: "n.", chinese: "鳳梨", sentence: "SpongeBob lives in a pineapple.", sentence_ch: "海綿寶寶住在鳳梨裡。" },
+                        
+                        // Others
+                        { id: "u5-17", word: "how many", part: "phr.", chinese: "多少 (問數量)", sentence: "How many apples do you have?", sentence_ch: "你有多少顆蘋果？" },
+                        { id: "u5-18", word: "need", part: "vt.", chinese: "需要", sentence: "I need some water.", sentence_ch: "我需要一些水。" },
+                        
+                        // Subjects
+                        { id: "u5-19", word: "art", part: "n.", chinese: "美術；藝術", sentence: "I like art class.", sentence_ch: "我喜歡美術課。" },
+                        { id: "u5-20", word: "Chinese", part: "n.", chinese: "中文；國語", sentence: "He speaks Chinese well.", sentence_ch: "他中文說得很好。" },
+                        { id: "u5-21", word: "English", part: "n.", chinese: "英語", sentence: "Can you speak English?", sentence_ch: "你會說英文嗎？" },
+                        { id: "u5-22", word: "math", part: "n.", chinese: "數學", sentence: "Math is difficult for me.", sentence_ch: "數學對我來說很難。" },
+                        { id: "u5-23", word: "music", part: "n.", chinese: "音樂", sentence: "She is listening to music.", sentence_ch: "她正在聽音樂。" },
+                        { id: "u5-24", word: "PE", part: "n.", chinese: "體育", sentence: "We run in PE class.", sentence_ch: "我們在體育課跑步。" },
+                        { id: "u5-25", word: "science", part: "n.", chinese: "自然科學", sentence: "Science is interesting.", sentence_ch: "自然科學很有趣。" },
+                        { id: "u5-26", word: "social studies", part: "n.", chinese: "社會", sentence: "We learn history in social studies.", sentence_ch: "我們在社會課學歷史。" },
+                        { id: "u5-27", word: "favorite", part: "adj.", chinese: "最喜愛的", sentence: "Red is my favorite color.", sentence_ch: "紅色是我最喜歡的顏色。" },
+                        { id: "u5-28", word: "subject", part: "n.", chinese: "科目", sentence: "What is your favorite subject?", sentence_ch: "你最喜歡的科目是什麼？" },
+                        
+                        // Pronouns (Possessive)
+                        { id: "u5-29", word: "his", part: "pron.", chinese: "他的 (所有格)", sentence: "This is his book.", sentence_ch: "這是他的書。" },
+                        { id: "u5-30", word: "her", part: "pron.", chinese: "她的 (所有格)", sentence: "Her name is Mary.", sentence_ch: "她的名字是瑪麗。" },
+                        { id: "u5-31", word: "our", part: "pron.", chinese: "我們的 (所有格)", sentence: "This is our house.", sentence_ch: "這是我們的房子。" },
+                        { id: "u5-32", word: "their", part: "pron.", chinese: "他們的 (所有格)", sentence: "Their car is blue.", sentence_ch: "他們的車是藍色的。" }
                     ],
-                    quiz: generateNumberQuizPool(),
-                    scramble: generateNumberScramblePool()
+                    grammar: {
+                        notes: [
+                            { 
+                                title: "1. 現在式 (Simple Present)", 
+                                rule: "S + V(s/es) ...", 
+                                desc: "用於表達事實、真理或習慣性的動作。注意第三人稱單數 (He/She/It) 動詞要加 s。", 
+                                examples: ["I go to school every day.", "She likes apples."] 
+                            },
+                            { 
+                                title: "2. 過去式 (Simple Past)", 
+                                rule: "S + V-ed / V(irr) ... + (past time)", 
+                                desc: "用於表達過去發生的動作或狀態。常搭配 yesterday, last night, ... ago。", 
+                                examples: ["I went to the park yesterday.", "We played baseball last week."] 
+                            },
+                            { 
+                                title: "3. 未來式 (Simple Future)", 
+                                rule: "S + will + V / S + be going to + V", 
+                                desc: "用於表達未來的計畫或預測。常搭配 tomorrow, next week。", 
+                                examples: ["I will visit my grandma tomorrow.", "He is going to study English."] 
+                            }
+                        ],
+                        quiz: generateUnit5QuizPool(),
+                        scramble: generateUnit5ScramblePool()
+                    }
                 }
-            },
-            unit5: {
-                title: "Unit 5 (Tenses)",
-                vocab: [
-                    // Days of the week
-                    { id: "u5-1", word: "Sunday", part: "n.", chinese: "星期日", sentence: "I go to church on Sunday.", sentence_ch: "我星期日去教堂。" },
-                    { id: "u5-2", word: "Monday", part: "n.", chinese: "星期一", sentence: "School starts on Monday.", sentence_ch: "星期一開始上學。" },
-                    { id: "u5-3", word: "Tuesday", part: "n.", chinese: "星期二", sentence: "We have PE on Tuesday.", sentence_ch: "我們星期二有體育課。" },
-                    { id: "u5-4", word: "Wednesday", part: "n.", chinese: "星期三", sentence: "It is Wednesday today.", sentence_ch: "今天是星期三。" },
-                    { id: "u5-5", word: "Thursday", part: "n.", chinese: "星期四", sentence: "I play soccer on Thursday.", sentence_ch: "我星期四踢足球。" },
-                    { id: "u5-6", word: "Friday", part: "n.", chinese: "星期五", sentence: "Thank God it's Friday.", sentence_ch: "感謝老天今天是星期五。" },
-                    { id: "u5-7", word: "Saturday", part: "n.", chinese: "星期六", sentence: "I sleep late on Saturday.", sentence_ch: "我星期六睡很晚。" },
-                    { id: "u5-8", word: "day", part: "n.", chinese: "一天；日", sentence: "There are seven days in a week.", sentence_ch: "一週有七天。" },
-                    { id: "u5-9", word: "today", part: "n./adv.", chinese: "今天", sentence: "Today is my birthday.", sentence_ch: "今天是我的生日。" },
-                    
-                    // Fruits
-                    { id: "u5-10", word: "apple", part: "n.", chinese: "蘋果", sentence: "An apple a day keeps the doctor away.", sentence_ch: "一天一蘋果，醫生遠離我。" },
-                    { id: "u5-11", word: "banana", part: "n.", chinese: "香蕉", sentence: "Monkeys like bananas.", sentence_ch: "猴子喜歡香蕉。" },
-                    { id: "u5-12", word: "grape", part: "n.", chinese: "葡萄", sentence: "The grape is purple.", sentence_ch: "這葡萄是紫色的。" },
-                    { id: "u5-13", word: "guava", part: "n.", chinese: "芭樂", sentence: "Guava is rich in Vitamin C.", sentence_ch: "芭樂富含維他命C。" },
-                    { id: "u5-14", word: "orange", part: "n.", chinese: "柳橙", sentence: "I like orange juice.", sentence_ch: "我喜歡柳橙汁。" },
-                    { id: "u5-15", word: "papaya", part: "n.", chinese: "木瓜", sentence: "Papaya milk is delicious.", sentence_ch: "木瓜牛奶很好喝。" },
-                    { id: "u5-16", word: "pineapple", part: "n.", chinese: "鳳梨", sentence: "SpongeBob lives in a pineapple.", sentence_ch: "海綿寶寶住在鳳梨裡。" },
-                    
-                    // Others
-                    { id: "u5-17", word: "how many", part: "phr.", chinese: "多少 (問數量)", sentence: "How many apples do you have?", sentence_ch: "你有多少顆蘋果？" },
-                    { id: "u5-18", word: "need", part: "vt.", chinese: "需要", sentence: "I need some water.", sentence_ch: "我需要一些水。" },
-                    
-                    // Subjects
-                    { id: "u5-19", word: "art", part: "n.", chinese: "美術；藝術", sentence: "I like art class.", sentence_ch: "我喜歡美術課。" },
-                    { id: "u5-20", word: "Chinese", part: "n.", chinese: "中文；國語", sentence: "He speaks Chinese well.", sentence_ch: "他中文說得很好。" },
-                    { id: "u5-21", word: "English", part: "n.", chinese: "英語", sentence: "Can you speak English?", sentence_ch: "你會說英文嗎？" },
-                    { id: "u5-22", word: "math", part: "n.", chinese: "數學", sentence: "Math is difficult for me.", sentence_ch: "數學對我來說很難。" },
-                    { id: "u5-23", word: "music", part: "n.", chinese: "音樂", sentence: "She is listening to music.", sentence_ch: "她正在聽音樂。" },
-                    { id: "u5-24", word: "PE", part: "n.", chinese: "體育", sentence: "We run in PE class.", sentence_ch: "我們在體育課跑步。" },
-                    { id: "u5-25", word: "science", part: "n.", chinese: "自然科學", sentence: "Science is interesting.", sentence_ch: "自然科學很有趣。" },
-                    { id: "u5-26", word: "social studies", part: "n.", chinese: "社會", sentence: "We learn history in social studies.", sentence_ch: "我們在社會課學歷史。" },
-                    { id: "u5-27", word: "favorite", part: "adj.", chinese: "最喜愛的", sentence: "Red is my favorite color.", sentence_ch: "紅色是我最喜歡的顏色。" },
-                    { id: "u5-28", word: "subject", part: "n.", chinese: "科目", sentence: "What is your favorite subject?", sentence_ch: "你最喜歡的科目是什麼？" },
-                    
-                    // Pronouns (Possessive)
-                    { id: "u5-29", word: "his", part: "pron.", chinese: "他的 (所有格)", sentence: "This is his book.", sentence_ch: "這是他的書。" },
-                    { id: "u5-30", word: "her", part: "pron.", chinese: "她的 (所有格)", sentence: "Her name is Mary.", sentence_ch: "她的名字是瑪麗。" },
-                    { id: "u5-31", word: "our", part: "pron.", chinese: "我們的 (所有格)", sentence: "This is our house.", sentence_ch: "這是我們的房子。" },
-                    { id: "u5-32", word: "their", part: "pron.", chinese: "他們的 (所有格)", sentence: "Their car is blue.", sentence_ch: "他們的車是藍色的。" }
-                ],
-                grammar: {
-                    notes: [
-                        { 
-                            title: "1. 現在式 (Simple Present)", 
-                            rule: "S + V(s/es) ...", 
-                            desc: "用於表達事實、真理或習慣性的動作。注意第三人稱單數 (He/She/It) 動詞要加 s。", 
-                            examples: ["I go to school every day.", "She likes apples."] 
-                        },
-                        { 
-                            title: "2. 過去式 (Simple Past)", 
-                            rule: "S + V-ed / V(irr) ... + (past time)", 
-                            desc: "用於表達過去發生的動作或狀態。常搭配 yesterday, last night, ... ago。", 
-                            examples: ["I went to the park yesterday.", "We played baseball last week."] 
-                        },
-                        { 
-                            title: "3. 未來式 (Simple Future)", 
-                            rule: "S + will + V / S + be going to + V", 
-                            desc: "用於表達未來的計畫或預測。常搭配 tomorrow, next week。", 
-                            examples: ["I will visit my grandma tomorrow.", "He is going to study English."] 
-                        }
-                    ],
-                    quiz: generateUnit5QuizPool(),
-                    scramble: generateUnit5ScramblePool()
-                }
-            }
+            };
         };
 
         // --- 共用樣式 ---
@@ -782,6 +796,7 @@
         
             const resetGame = () => {
                 const count = 5; 
+                // 每次都重新洗牌完整題庫，確保隨機性
                 const shuffledQuestions = shuffleArray([...data]).slice(0, count); 
                 setQuestions(shuffledQuestions);
                 setCurrentIndex(0);
@@ -806,6 +821,7 @@
             const handleSkipQuestion = () => {
                 if (questions.length <= 1) return; 
                 const currentQuestionIds = questions.map(q => q.id);
+                // 確保從未被選中的題目中挑選
                 const candidates = data.filter(item => !currentQuestionIds.includes(item.id));
                 let newQuestion;
                 if (candidates.length > 0) {
@@ -958,6 +974,7 @@
             const [quizList, setQuizList] = useState([]);
 
             const prepareQuizData = (rawList) => {
+                // 這裡也加入隨機洗牌，確保選項順序每次都不同
                 return rawList.map(item => ({
                     ...item,
                     options: shuffleArray([...item.options]) 
@@ -966,6 +983,7 @@
 
             useEffect(() => {
                 if (grammarData?.quiz) { 
+                    // 每次進入文法模式都重新從題庫中隨機挑選 10 題
                     const raw = shuffleArray([...grammarData.quiz]).slice(0, 10);
                     setQuizList(prepareQuizData(raw)); 
                 }
@@ -1076,6 +1094,10 @@
         function Unit34App() {
             const [activeTab, setActiveTab] = useState('study');
             const [currentUnit, setCurrentUnit] = useState('unitNumbers'); 
+            
+            // 使用 useMemo 確保每次切換單元時重新生成數據，保證隨機性
+            // 修正：加入 activeTab 作為依賴，確保切換分頁時重新洗牌
+            const UNITS_DATA = React.useMemo(() => getUnitsData(), [currentUnit, activeTab]);
 
             const unitTitle = UNITS_DATA[currentUnit].title;
             const unitData = UNITS_DATA[currentUnit].vocab;
@@ -1091,7 +1113,7 @@
                         <div className="flex items-center gap-2 font-black text-slate-600 text-lg tracking-tight ml-2"><Map className="w-6 h-6 text-sky-500" /><span>MAP</span></div>
                         <div className="flex gap-2">
                             {['unitNumbers', 'unit5'].map(uKey => (
-                            <button key={uKey} onClick={() => setCurrentUnit(uKey)} className={`px-3 py-1 text-xs sm:text-sm font-black rounded-xl transition-all border-b-4 active:border-b-0 active:translate-y-1 ${currentUnit === uKey ? 'bg-sky-500 border-sky-700 text-white shadow-sky-200' : 'bg-white border-slate-300 text-slate-400 hover:bg-slate-50'}`}>{UNITS_DATA[uKey].title}</button>
+                            <button key={uKey} onClick={() => {setCurrentUnit(uKey); setActiveTab('study');}} className={`px-3 py-1 text-xs sm:text-sm font-black rounded-xl transition-all border-b-4 active:border-b-0 active:translate-y-1 ${currentUnit === uKey ? 'bg-sky-500 border-sky-700 text-white shadow-sky-200' : 'bg-white border-slate-300 text-slate-400 hover:bg-slate-50'}`}>{getUnitsData()[uKey].title}</button>
                             ))}
                         </div>
                     </div>
@@ -1105,10 +1127,11 @@
                 </div>
                 <div className="flex-1 max-w-md mx-auto w-full p-4 pt-6">
                     <div className="mb-6 text-center"><span className="inline-flex items-center gap-2 bg-slate-800 text-white text-xs font-black px-4 py-1.5 rounded-full border-2 border-slate-600 shadow-md"><Map className="w-3 h-3 text-yellow-400" />目前關卡：{unitTitle}</span></div>
-                    {activeTab === 'study' && <StudyMode data={unitData} />}
-                    {activeTab === 'quiz' && <QuizMode data={unitData} grammarData={unitGrammar} />}
-                    {activeTab === 'sentences' && <ScrambleMode data={unitData} />}
-                    {activeTab === 'grammar' && <GrammarMode grammarData={unitGrammar} />}
+                    {/* 使用 key 屬性強制在切換 tab 時重新渲染，確保隨機性 */}
+                    {activeTab === 'study' && <StudyMode key={`study-${currentUnit}-${activeTab}`} data={unitData} />}
+                    {activeTab === 'quiz' && <QuizMode key={`quiz-${currentUnit}-${activeTab}`} data={unitData} grammarData={unitGrammar} />}
+                    {activeTab === 'sentences' && <ScrambleMode key={`scramble-${currentUnit}-${activeTab}`} data={unitData} />}
+                    {activeTab === 'grammar' && <GrammarMode key={`grammar-${currentUnit}-${activeTab}`} grammarData={unitGrammar} />}
                 </div>
                 </div>
             );
